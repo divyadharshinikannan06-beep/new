@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+<<<<<<< HEAD
 const User = require('../models/user.model');
 
 async function authMiddleware(req, res, next) {
@@ -32,3 +33,27 @@ async function authMiddleware(req, res, next) {
 }
 
 module.exports = authMiddleware;
+=======
+
+function authMiddleware(req, res, next) {
+	const authorization = req.headers.authorization;
+	const [scheme, token] = authorization ? authorization.split(' ') : [];
+
+	if (scheme !== 'Bearer' || !token) {
+		return res.status(401).json({ message: 'Authentication token required' });
+	}
+
+	if (!process.env.JWT_SECRET) {
+		return next(new Error('JWT_SECRET is not configured'));
+	}
+
+	try {
+		req.user = jwt.verify(token, process.env.JWT_SECRET);
+		return next();
+	} catch (error) {
+		return res.status(401).json({ message: 'Invalid or expired authentication token' });
+	}
+}
+
+module.exports = authMiddleware;
+>>>>>>> f746283f901bfc7bee37a1353f8027d29e1105e8
